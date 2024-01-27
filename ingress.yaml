@@ -1,0 +1,63 @@
+## Common properties
+##
+global:
+  imageRegistry: docker.io
+  imagePullSecrets: []
+  storageClass: "-"
+  isEnterprise: false
+
+## Odoo image properties
+##
+image:
+  registry: docker.io
+  repository: bitnami/odoo
+  tag: 16.0.1-debian-10-r28
+  pullPolicy: IfNotPresent
+
+## Odoo configuration options
+##
+odoo:
+  persistence:
+    enabled: true
+    storageClass: "-"
+    accessMode: ReadWriteOnce
+    size: 8Gi
+  adminPassword: admin
+  email:
+    host: smtp.gmail.com
+    port: 587
+    user: ghadaboukhari8@gmail.com
+    password: admin
+    tls: true
+    from: ghadaboukhari8@gmail.com
+  extraEnvVars:
+    - name: ODOO_HTTPS
+      value: "on"
+    - name: ODOO_HTTPS_PORT
+      value: "443"
+    - name: ODOO_HTTPS_CERT_FILE
+      value: "/certs/tls.crt"
+    - name: ODOO_HTTPS_KEY_FILE
+      value: "/certs/tls.key"
+
+## Service properties
+##
+service:
+  type: LoadBalancer
+  port: 80
+  tls:
+    enabled: true
+    secretName: odoo-tls-secret
+
+## Ingress properties
+##
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - name: odoo
+      path: /
+      tls: true
